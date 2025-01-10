@@ -23,6 +23,9 @@ public class Main {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
+    static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+
     public static void main(String[] args) {
 
         try {
@@ -39,7 +42,6 @@ public class Main {
                     final var activeProduce = omnik.current;
                     final var totalUsage = activeImport + activeProduce;
 
-                    DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
                     if (activeImport > 0) {
                         System.out.println("%s: using %d (import %d, generated %d)".formatted(formatter.format(LocalDateTime.now()), totalUsage, activeImport, activeProduce));
@@ -48,7 +50,7 @@ public class Main {
 
                     }
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("%s: %s".formatted(formatter.format(LocalDateTime.now()), e.getMessage()));
                 }
 
                 try {
@@ -60,22 +62,29 @@ public class Main {
             }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("%s: %s".formatted(formatter.format(LocalDateTime.now()), e.getMessage()));
             System.exit(1);
         }
 
-        System.out.println("loop terminated");
+        System.out.println("%s: terminated)".formatted(formatter.format(LocalDateTime.now())));
     }
 
 
     static HomeWizardP1 readP1HomeWizard(URI uri) throws Exception {
-        final InputStreamReader reader = new InputStreamReader(uri.toURL().openStream());
-        return gson.fromJson(reader, HomeWizardP1.class);
+        final URLConnection connection = uri.toURL().openConnection();
+        connection.setReadTimeout(1000);
+        connection.setConnectTimeout(1000);
+        try (final var stream =  connection.getInputStream()) {
+            final InputStreamReader reader = new InputStreamReader(stream);
+            return gson.fromJson(reader, HomeWizardP1.class);
+        }
     }
 
     static Omnik readOmnik(URI uri) throws Exception {
-        URLConnection conn = uri.toURL().openConnection();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+        final URLConnection urlConnection = uri.toURL().openConnection();
+        urlConnection.setConnectTimeout(1000);
+        urlConnection.setReadTimeout(1000);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null; ) {
                 if (line.contains("myDeviceArray[0]=")) {
                     final var ss = line.split(",");
