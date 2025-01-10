@@ -41,8 +41,12 @@ public class Main {
 
                     DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
+                    if (activeImport > 0) {
+                        System.out.println("%s: using %d (import %d, generated %d)".formatted(formatter.format(LocalDateTime.now()), totalUsage, activeImport, activeProduce));
+                    } else {
+                        System.out.println("%s: using %d (export %d, generated %d)".formatted(formatter.format(LocalDateTime.now()), totalUsage, -activeImport, activeProduce));
 
-                    System.out.println("%s %d %d %d".formatted(formatter.format(LocalDateTime.now()), totalUsage, activeImport, activeProduce));
+                    }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
