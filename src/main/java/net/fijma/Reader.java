@@ -38,13 +38,20 @@ public class Reader {
     }
 
     public HomeWizardP1 readP1HomeWizard() throws IOException {
-        final InputStreamReader reader = new InputStreamReader(homewizardUrl.openStream());
-        return gson.fromJson(reader, HomeWizardP1.class);
+        final URLConnection connection = homewizardUrl.openConnection();
+        connection.setReadTimeout(1000);
+        connection.setConnectTimeout(1000);
+        try (final var stream =  connection.getInputStream()) {
+            final InputStreamReader reader = new InputStreamReader(stream);
+            return gson.fromJson(reader, HomeWizardP1.class);
+        }
     }
 
     public Omnik readOmnik() throws IOException {
-        URLConnection conn = omnikUrl.openConnection();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+        final URLConnection urlConnection = omnikUrl.openConnection();
+        urlConnection.setConnectTimeout(1000);
+        urlConnection.setReadTimeout(1000);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null; ) {
                 if (line.contains("myDeviceArray[0]=")) {
                     final var ss = line.split(",");

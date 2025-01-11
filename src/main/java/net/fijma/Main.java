@@ -1,20 +1,29 @@
 package net.fijma;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Main {
 
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
+    static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+
+
     public static void main(String[] args) {
         try {
             loop(Reader.create());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("{}", e.getMessage());
             System.exit(1);
         }
-        System.out.println("loop terminated");
+        System.out.println("%s: terminated)".formatted(formatter.format(LocalDateTime.now())));
     }
 
     private static void loop(Reader reader) {
@@ -30,13 +39,12 @@ public class Main {
                 DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
                 if (activeImport > 0) {
-                    System.out.println("%s: using %d (import %d, generated %d)".formatted(formatter.format(LocalDateTime.now()), totalUsage, activeImport, activeProduce));
+                    logger.info("using {} (imported {}, generated {})", totalUsage, activeImport, activeProduce);
                 } else {
-                    System.out.println("%s: using %d (export %d, generated %d)".formatted(formatter.format(LocalDateTime.now()), totalUsage, -activeImport, activeProduce));
-
+                    logger.info("using {} (exported {}, generated {})", totalUsage, -activeImport, activeProduce);
                 }
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                logger.error("{}", e.getMessage());
             }
 
             try {
