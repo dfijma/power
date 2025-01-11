@@ -44,6 +44,8 @@ public class Reader {
         try (final var stream =  connection.getInputStream()) {
             final InputStreamReader reader = new InputStreamReader(stream);
             return gson.fromJson(reader, HomeWizardP1.class);
+        } catch (IOException e) {
+            throw new IOException("homewizard read error: %s".formatted(e.getMessage()));
         }
     }
 
@@ -61,8 +63,10 @@ public class Reader {
                     return new Omnik(current, today, total);
                 }
             }
+        } catch (IOException e) {
+            throw new IOException("omnik read error: %s".formatted(e.getMessage()));
         }
-        throw new RuntimeException("Unable to find Omnik data in response");
+        throw new IOException("omnik read error: no valid data in response");
     }
 
 }

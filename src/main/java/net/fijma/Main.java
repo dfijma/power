@@ -1,20 +1,13 @@
 package net.fijma;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-
-    static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-
 
     public static void main(String[] args) {
         try {
@@ -23,7 +16,7 @@ public class Main {
             logger.error("{}", e.getMessage());
             System.exit(1);
         }
-        System.out.println("%s: terminated)".formatted(formatter.format(LocalDateTime.now())));
+        logger.info("terminated");
     }
 
     private static void loop(Reader reader) {
@@ -35,8 +28,6 @@ public class Main {
                 final var activeImport = (int) p1HomeWizard.activePowerW();
                 final var activeProduce = omnik.current();
                 final var totalUsage = activeImport + activeProduce;
-
-                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
                 if (activeImport > 0) {
                     logger.info("using {} (imported {}, generated {})", totalUsage, activeImport, activeProduce);
@@ -52,9 +43,7 @@ public class Main {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
         }
     }
-
 
 }
