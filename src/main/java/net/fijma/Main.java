@@ -39,7 +39,7 @@ public class Main {
             }
 
             try {
-                Thread.sleep(10_000);
+                Thread.sleep(120 * 1_000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
